@@ -20,7 +20,7 @@ type Event struct {
 func AddEvent(id,name,date,time,description,location string) (int){
 	_,err := db.Exec(`
 		INSERT INTO public."events" ("ID","SUBJECT","STARTDATETIME","ENDDATETIME","DESCRIPTION","LOCATION")
-		VALUES ($1,$2,$3,$4)`,id,name,date,time,description,location)
+		VALUES ($1,$2,$3,$4,$5,$6)`,id,name,date,time,description,location)
 	
 	if err != nil {
 		log.Printf("Insertion Error : %v",err)
