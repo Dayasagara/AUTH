@@ -13,6 +13,34 @@ type User struct {
 	password  string 
 	username string  
 }
+
+func CreateTable(){
+	_,err1 := db.Exec(`
+	CREATE TABLE public.user (
+		"USERNAME" VARCHAR (255) PRIMARY KEY,
+		"EMAIL" VARCHAR (255), "PASSWORD" VARCHAR (255))`)
+	if err1 != nil {
+		log.Printf("Creation Error : %v",err1)
+	}else{
+		log.Printf("Table Created successfully") 
+	}
+	_,err := db.Exec(`
+	CREATE TABLE public.events
+(
+    "ID" text COLLATE pg_catalog."default" NOT NULL,
+    "SUBJECT" text COLLATE pg_catalog."default" NOT NULL,
+    "STARTDATETIME" timestamp with time zone,
+    "ENDDATETIME" timestamp with time zone,
+    "DESCRIPTION" text COLLATE pg_catalog."default",
+    "LOCATION" text COLLATE pg_catalog."default"
+)`)
+	if err != nil {
+		log.Printf("Creation Error : %v",err)
+	}else{
+		log.Printf("Table Created successfully") 
+	}
+}
+
 //Signup, Inserting user details into the database 
 func Signup(username, email, password string) int{
 	hasher := sha512.New()
@@ -55,7 +83,7 @@ func Login(email, password string) (*User, error) {
 }
 
 //ChangePassword
-func ChangePassword(email,oldPassword,newPassword string) {
+func ChangePassword(email,oldPassword,newPassword string) int {
 	result := &User{}
 	hasher := sha512.New()
 	hasher.Write([]byte(oldPassword))
@@ -75,8 +103,11 @@ func ChangePassword(email,oldPassword,newPassword string) {
 		WHERE "EMAIL"=$2`,pwd1,email)
 		if err != nil {
 			log.Printf("Updation Error : %v",err)
+			return 0
 		}else{
 			log.Printf("Updated successfully")
+			return 1
 		}
 	}
+	return 2
 }
