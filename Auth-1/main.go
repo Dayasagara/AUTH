@@ -11,7 +11,7 @@ import (
     "crypto/sha512"
 	"encoding/base64"
     mydb "./mydb"
-    ms "./email"
+    //ms "./email"
     _ "github.com/lib/pq"
     helper "./helpers"
     "github.com/dgrijalva/jwt-go"
@@ -35,6 +35,9 @@ func main() {
     
     defer db.Close()
     
+    mux.HandleFunc("/CreateTable", func(w http.ResponseWriter, r *http.Request) {
+        mydb.CreateTable()
+    })
     // Signup
     mux.HandleFunc("/signup", func(w http.ResponseWriter, r *http.Request) {
         r.ParseForm()
@@ -54,11 +57,10 @@ func main() {
             fmt.Fprintf(w, "ErrorCode is -10 : There is empty data.")
             return
         }
- 
         if pwd == pwdConfirm {
             flag := mydb.Signup(uName,email,pwd)
             if flag == 1{
-                ms.RegistrationMail(email)
+                fmt.Fprintln(w, "Account Created")
             }
         } else {
             fmt.Fprintln(w, "Password information must be the same.")
@@ -72,7 +74,12 @@ func main() {
         newPassword := r.FormValue("NewPassword")  // Data from the form
         confirmPassword := r.FormValue("ConfirmPassword") // Data from the form
         if confirmPassword==newPassword{
-            mydb.ChangePassword(email,oldPassword,newPassword)
+            flag:=mydb.ChangePassword(email,oldPassword,newPassword)
+            if flag == 1{
+                fmt.Fprintln(w, "Password Changed successfully")
+            }
+        } else {
+            fmt.Fprintln(w, "Error")
         }
     })
 
@@ -111,6 +118,7 @@ func main() {
                 
             }  
             fmt.Fprintf(file,tokenString) 
+            fmt.Fprintln(w,"Login Successful")
             defer file.Close()
             
             log.Printf("User has logged in: %v\n", user)
