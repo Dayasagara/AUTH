@@ -10,10 +10,10 @@ import (
     "io/ioutil"
     "crypto/sha512"
 	"encoding/base64"
-    mydb "./mydb"
+    mydb "auth/mydb"
     //ms "./email"
     _ "github.com/lib/pq"
-    helper "./helpers"
+    helper "auth/helpers"
     "github.com/dgrijalva/jwt-go"
 )
 
@@ -221,7 +221,7 @@ func main() {
 }
 //Database connection
 func connectToDatabase() *sql.DB {
-	db, err := sql.Open("postgres", "postgres://postgres:root@localhost/postgres?sslmode=disable")
+	db, err := sql.Open("postgres", "postgres://postgres:root@db/postgres?sslmode=disable")
 	if err != nil {
 		log.Fatalln(fmt.Errorf("Unable to connect to database: %v", err))
 	}
